@@ -94,6 +94,7 @@ class LanguagePack::Ruby < LanguagePack::Base
         create_database_yml
         install_binaries
         run_assets_precompile_rake_task
+        generate_jekyll_site
       end
       super
     end
@@ -686,6 +687,12 @@ params = CGI.parse(uri.query || "")
         end
       end
     end
+  end
+
+  def generate_jekyll_site
+    puts "Generating Jekyll site..."
+    pipe "env PATH=$PATH bundle exec jekyll build 2>&1"
+    error "Failed to generate site with Jekyll." unless $? == 0
   end
 
   def bundler_cache
