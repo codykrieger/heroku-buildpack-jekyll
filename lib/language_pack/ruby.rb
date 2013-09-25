@@ -11,7 +11,7 @@ class LanguagePack::Ruby < LanguagePack::Base
   extend LanguagePack::BundlerLockfile::ClassMethods
 
   NAME                 = "ruby"
-  BUILDPACK_VERSION    = "v79"
+  BUILDPACK_VERSION    = "v80"
   LIBYAML_VERSION      = "0.1.4"
   LIBYAML_PATH         = "libyaml-#{LIBYAML_VERSION}"
   BUNDLER_VERSION      = "1.3.2"
@@ -234,7 +234,7 @@ private
     instrument 'setup_profiled' do
       set_env_override "GEM_PATH", "$HOME/#{slug_vendor_base}:$GEM_PATH"
       set_env_default  "LANG",     "en_US.UTF-8"
-      set_env_override "PATH",     "$HOME/bin:$HOME/#{slug_vendor_base}/bin:$PATH"
+      set_env_override "PATH",     "$HOME/bin:$HOME/#{slug_vendor_base}/bin:$HOME/#{bundler_binstubs_path}:$PATH"
 
       if ruby_version_jruby?
         set_env_default "JAVA_OPTS", default_java_opts
@@ -247,7 +247,7 @@ private
   # determines if a build ruby is required
   # @return [Boolean] true if a build ruby is required
   def build_ruby?
-    @build_ruby ||= !ruby_version_rbx? && !ruby_version_jruby? && !%w{ruby-1.9.3 ruby-2.0.0}.include?(ruby_version)
+    @build_ruby ||= %w{ruby-1.8.7 ruby-1.9.2}.include?(ruby_version)
   end
 
   # install the vendored ruby
