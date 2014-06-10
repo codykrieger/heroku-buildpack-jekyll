@@ -14,7 +14,7 @@ Encoding.default_external = Encoding::UTF_8 if defined?(Encoding)
 class LanguagePack::Base
   include LanguagePack::ShellHelpers
 
-  VENDOR_URL = "https://s3.amazonaws.com/heroku-buildpack-ruby"
+  VENDOR_URL = ENV['BUILDPACK_VENDOR_URL'] || "https://s3-external-1.amazonaws.com/heroku-buildpack-ruby"
 
   attr_reader :build_path, :cache
 
@@ -74,6 +74,7 @@ class LanguagePack::Base
 
   # this is called to build the slug
   def compile
+    write_release_yaml
     instrument 'base.compile' do
       if @warnings.any?
         topic "WARNINGS:"
@@ -86,16 +87,20 @@ class LanguagePack::Base
     end
   end
 
-  # collection of values passed for a release
-  # @return [String] in YAML format of the result
-  def release
-    instrument "base.release" do
-      setup_language_pack_environment
+  def write_release_yaml
+    release = {}
+    release["addons"]                = default_addons
+    release["config_vars"]           = default_config_vars
+    release["default_process_types"] = default_process_types
+    FileUtils.mkdir("tmp") unless File.exists?("tmp")
+    File.open("tmp/heroku-buildpack-release-step.yml", 'w') do |f|
+      f.write(release.to_yaml)
+    end
 
-      {
-        "addons" => default_addons,
-        "default_process_types" => default_process_types
-      }.to_yaml
+    unless File.exist?("Procfile")
+      msg =  "No Procfile detected, using the default web server (webrick)\n"
+      msg << "https://devcenter.heroku.com/articles/ruby-default-web-server"
+      warn msg
     end
   end
 

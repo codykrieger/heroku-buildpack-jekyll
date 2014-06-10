@@ -5,14 +5,15 @@ require "language_pack/rails3"
 class LanguagePack::Rails4 < LanguagePack::Rails3
   ASSETS_CACHE_LIMIT = 52428800 # bytes
 
-  # detects if this is a Rails 3.x app
-  # @return [Boolean] true if it's a Rails 3.x app
+  # detects if this is a Rails 4.x app
+  # @return [Boolean] true if it's a Rails 4.x app
   def self.use?
     instrument "rails4.use" do
-      if gemfile_lock?
-        rails_version = LanguagePack::Ruby.gem_version('railties')
-        rails_version >= Gem::Version.new('4.0.0.beta') && rails_version < Gem::Version.new('5.0.0') if rails_version
-      end
+      rails_version = bundler.gem_version('railties')
+      return false unless rails_version
+      is_rails4 = rails_version >= Gem::Version.new('4.0.0.beta') &&
+                  rails_version <  Gem::Version.new('4.1.0.beta1')
+      return is_rails4
     end
   end
 
@@ -45,8 +46,8 @@ class LanguagePack::Rails4 < LanguagePack::Rails3
 
   def install_plugins
     instrument "rails4.install_plugins" do
-      return false if gem_is_bundled?('rails_12factor')
-      plugins = ["rails_serve_static_assets", "rails_stdout_logging"].reject { |plugin| gem_is_bundled?(plugin) }
+      return false if bundler.has_gem?('rails_12factor')
+      plugins = ["rails_serve_static_assets", "rails_stdout_logging"].reject { |plugin| bundler.has_gem?(plugin) }
       return false if plugins.empty?
 
     warn <<-WARNING
@@ -68,40 +69,33 @@ WARNING
   def run_assets_precompile_rake_task
     instrument "rails4.run_assets_precompile_rake_task" do
       log("assets_precompile") do
-        setup_database_url_env
+        if Dir.glob('public/assets/manifest-*.json').any?
+          puts "Detected manifest file, assuming assets were compiled locally"
+          return true
+        end
 
-        if rake_task_defined?("assets:precompile")
-          topic("Preparing app for Rails asset pipeline")
-          if Dir.glob('public/assets/manifest-*.json').any?
-            puts "Detected manifest file, assuming assets were compiled locally"
-          else
-            ENV["RAILS_GROUPS"] ||= "assets"
-            ENV["RAILS_ENV"]    ||= "production"
+        precompile = rake.task("assets:precompile")
+        return true unless precompile.is_defined?
 
-            @cache.load public_assets_folder
-            @cache.load default_assets_cache
+        topic("Preparing app for Rails asset pipeline")
 
-            puts "Running: rake assets:precompile"
-            require 'benchmark'
-            time = Benchmark.realtime { pipe("env PATH=$PATH:bin bundle exec rake assets:precompile 2>&1 > /dev/null") }
+        @cache.load public_assets_folder
+        @cache.load default_assets_cache
 
-            if $?.success?
-              log "assets_precompile", :status => "success"
-              puts "Asset precompilation completed (#{"%.2f" % time}s)"
+        precompile.invoke(env: rake_env)
 
-              puts "Cleaning assets"
-              pipe "env PATH=$PATH:bin bundle exec rake assets:clean 2>& 1"
+        if precompile.success?
+          log "assets_precompile", :status => "success"
+          puts "Asset precompilation completed (#{"%.2f" % precompile.time}s)"
 
-              cleanup_assets_cache
-              @cache.store public_assets_folder
-              @cache.store default_assets_cache
-            else
-              log "assets_precompile", :status => "failure"
-              error "Precompiling assets failed."
-            end
-          end
+          puts "Cleaning assets"
+          rake.task("assets:clean").invoke(env: rake_env)
+
+          cleanup_assets_cache
+          @cache.store public_assets_folder
+          @cache.store default_assets_cache
         else
-          puts "Error detecting the assets:precompile task"
+          precompile_fail(precompile.output)
         end
       end
     end

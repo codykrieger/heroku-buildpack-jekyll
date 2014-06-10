@@ -1,3 +1,307 @@
+## Master
+
+## v119 (5/9/2014)
+
+* Temporarily disable default ruby cache
+
+## v118 (5/6/2014)
+
+* Ruby version detection now loads user environment variables
+
+## v117 (4/14/2014)
+
+Features:
+
+
+Bugfixes:
+
+* fix anvil use case of multibuildpack with node
+
+
+## v116 (4/10/2014)
+
+Features:
+
+
+Bugfixes:
+
+* Revert back to Bundler 1.5.2
+
+
+## v115 (4/9/2014)
+
+Features:
+
+
+Bugfixes:
+
+* Add default process types to all apps deployed regardless of `Procfile`
+
+## v114 (4/9/2014)
+
+Features:
+
+* Bundler 1.6.1
+* Warn when not using a Procfile (looking at you webrick)
+
+Bugfixes:
+
+
+## v113 (4/8/2014)
+
+Features:
+
+* use heroku-buildpack-nodejs's node binary
+* `CURL_CONNECT_TIMEOUT` and `CURL_TIMEOUT` are configurable as ENV vars
+
+Bugfixes:
+
+* Don't double print "Running: rake assets:precompile" on Ruby apps
+
+
+## v112 (3/27/2014)
+
+Features:
+
+
+Bugfixes:
+
+* compile psych with libyaml 0.1.6 for CVE-2014-2525
+
+## v111 (3/20/2014)
+
+Features:
+
+
+Bugfixes:
+
+* spelling
+
+
+## v110 (3/20/2014)
+
+Features:
+
+* Better message when running `assets:precompile` without a database
+
+Bugfixes:
+
+## v108 (2/27/2014)
+
+Features:
+
+* parse Bundler patchlevel option
+
+Bugfixes:
+
+* don't let users step on themselves by replacing `env` in `$PATH`
+
+## v107 (2/26/2014)
+
+Features:
+
+Bugfixes:
+
+* more shellescaping bug fixes
+
+
+## v105
+
+Rollbacked to v103
+
+
+## v104 (2/26/2014)
+
+Features:
+
+Bugfixes:
+
+* fix bugs in shellescaping (#231)
+
+
+## v103 (2/18/2014)
+
+Features:
+
+* Rails 4.1.0 Support. Stop writing database.yml and support for secrets.yml by generating SECRET_KEY_BASE for users.
+
+Bugfixes:
+
+
+## v102 (2/6/2014)
+
+Features:
+
+Bugfixes:
+
+* use blacklist of env vars, so users can't break the build process
+
+
+## v101 (2/5/2014)
+
+Features:
+
+Bugfixes:
+
+* fix rake detection when DATABASE_URL is not present
+* support BUNDLE_WITHOUT when using ponies
+* quote ponies env vars, so build doesn't break
+
+
+## v100 (2/4/2014)
+
+Features:
+
+Bugfixes:
+
+* compile psych with libyaml 0.1.5 for CVE-2013-6393
+
+## v99 (2/4/2014)
+
+Features:
+
+* Noop
+
+Bugfixes:
+
+
+## v98 (1/30/2014)
+
+Features:
+
+Bugfixes:
+
+* Use vendored JDK binary during build
+
+
+## v97 (1/30/2014)
+
+Features:
+
+Bugfixes:
+
+* Actually finalize method rename to `install_bundler_in_app`
+
+
+## v96 (1/29/2014)
+
+Features:
+
+Bugfixes:
+
+* Finalize method rename to `install_bundler_in_app`
+
+## v95
+
+Rollback to v93
+
+## v94 (1/29/2014)
+
+Features:
+
+Bugfixes:
+
+* Fixed `uninitialized constant Rake::DSL` error when running rake tasks on Ruby 1.9.2
+
+## v93 (01/28/2014)
+
+Features:
+
+* buildpack-env-arg (ponies) support
+
+Bugfixes:
+
+## v92 (01/27/2014)
+
+Features:
+
+Bugfixes:
+
+* Only display rake error messages if a `Rakefile` exists
+* when detecting for ruby version, don't use stderr messages
+
+## v91 (01/16/2014)
+
+Features:
+
+* Parallel gem installation with bundler 1.5.2
+
+Bugfixes:
+
+
+## v90 (01/09/2014)
+
+Features:
+
+* Rollback v89 due to bug in bundler 1.5.1
+
+Bugfixes:
+
+## v89 (01/09/2014)
+
+Features:
+
+* Use most recent version of bundler with support for parallel Gem installation
+
+Bugfixes:
+
+## v86 (12/11/2013)
+
+Features:
+
+Bugfixes:
+
+* Windows warnings will now display before bundle install, this prevents an un-resolvable `Gemfile` from erroring which previously prevented the warning roll up from being shown. When this happened the developer did not see that we are clearing the `Gemfile.lock` from the git repository when bundled on a windows machine.
+* Checks for `public/assets/manifest*.json` and `public/assets/manifest.yml` will now come before Rake task detection introduced in v85.
+
+## v85 (12/05/2013)
+
+Features:
+
+
+Bugfixes:
+
+* Any errors in a Rakefile will now be explicitly shown as such instead of hidden in a `assets:precompile` task detection failure (#171)
+* Now using correct default "hobby" database #179
+
+## v84 (11/06/2013)
+
+Features:
+
+* Any Ruby app with a rake `assets:precompile` task present that does not run successfully will now fail. This matches the current behavior of Rails 3 and 4 deploys.
+
+
+Bugfixes:
+
+* Fix default gem cache
+
+## v83 (10/29/2013)
+
+Features:
+
+* RubyVersion extracted into its own class
+* Release no longer requires language_pack
+* Detect no longer requires language_pack
+* Downloads with curl now retry on failed connections, pass exit status appropriately
+
+Bugfixes:
+
+* Errors in Gemfiles will no longer show up as bad ruby versions #36
+* Fix warning warning libjffi-1.2.so on < JRuby 1.7.3
+
+## v82 (10/28/2013)
+
+Bugfixes:
+
+* Rails 3 deploys that do not successfully run `assets:precompile` will now fail.
+
+## v81 (10/15/2013)
+
+Features:
+
+* add Default Bundler Cache for new Ruby 2.0.0 apps
+* use Virginia S3 bucket instead of Cloudfront
+
 ## v80 (9/23/2013)
 
 Features:
