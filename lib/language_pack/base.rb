@@ -22,6 +22,7 @@ class LanguagePack::Base
   # @param [String] the path of the build dir
   # @param [String] the path of the cache dir this is nil during detect and release
   def initialize(build_path, cache_path=nil)
+    puts "build_path: #{build_path}; cache_path: #{cache_path}"
      self.class.instrument "base.initialize" do
       @build_path   = build_path
       @cache        = LanguagePack::Cache.new(cache_path) if cache_path
