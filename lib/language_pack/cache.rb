@@ -24,6 +24,7 @@ class LanguagePack::Cache
   # load cache contents
   # @param [String] relative path of the cache contents
   def load(path)
+    puts "loading #{@cache_base + path}"
     copy (@cache_base + path), path
   end
 
@@ -31,6 +32,7 @@ class LanguagePack::Cache
   # @param [String] source directory
   # @param [String] destination directory
   def copy(from, to)
+    puts "copying to #{to} (#{Dir.pwd})"
     return false unless File.exist?(from)
     FileUtils.mkdir_p File.dirname(to)
     system("cp -a #{from}/. #{to}")
