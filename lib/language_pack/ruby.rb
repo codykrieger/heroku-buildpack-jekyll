@@ -534,6 +534,9 @@ WARNING
 
         if $?.success?
           puts "Bundle completed (#{"%.2f" % bundle_time}s)"
+
+          pipe "ls -al /app/tmp/cache || :"
+
           log "bundle", :status => "success"
           puts "Cleaning up the bundler cache."
           instrument "ruby.bundle_clean" do
@@ -546,6 +549,10 @@ WARNING
           end
           cache.store ".bundle"
           cache.store "vendor/bundle"
+
+          pipe "ls -al /app/tmp/cache || :"
+
+          puts "slug_vendor_base: #{slug_vendor_base}"
 
           # Keep gem cache out of the slug
           FileUtils.rm_rf("#{slug_vendor_base}/cache")
