@@ -505,6 +505,8 @@ WARNING
           libyaml_dir = "#{tmpdir}/#{LIBYAML_PATH}"
           install_libyaml(libyaml_dir)
 
+          puts "current directory: #{pwd}"
+
           # need to setup compile environment for the psych gem
           yaml_include   = File.expand_path("#{libyaml_dir}/include").shellescape
           yaml_lib       = File.expand_path("#{libyaml_dir}/lib").shellescape
